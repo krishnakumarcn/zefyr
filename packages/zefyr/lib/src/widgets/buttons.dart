@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:notus/notus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,6 +28,21 @@ class ZefyrButton extends StatelessWidget {
         assert(icon != null),
         _icon = icon,
         _iconSize = iconSize,
+        _svgPath = null,
+        _text = null,
+        _textStyle = null,
+        super();
+
+  ZefyrButton.svg({
+    @required this.action,
+    @required String assetName,
+    double iconSize,
+    this.onPressed,
+  })  : assert(action != null),
+        assert(assetName != null),
+        _icon = null,
+        _iconSize = iconSize,
+        _svgPath = assetName,
         _text = null,
         _textStyle = null,
         super();
@@ -46,6 +62,7 @@ class ZefyrButton extends StatelessWidget {
         _iconSize = null,
         _text = text,
         _textStyle = style,
+        _svgPath = null,
         super();
 
   /// Toolbar action associated with this button.
@@ -54,6 +71,7 @@ class ZefyrButton extends StatelessWidget {
   final double _iconSize;
   final String _text;
   final TextStyle _textStyle;
+  final String _svgPath;
 
   /// Callback to trigger when this button is tapped.
   final VoidCallback onPressed;
@@ -71,7 +89,17 @@ class ZefyrButton extends StatelessWidget {
     final iconColor = (pressedHandler == null)
         ? toolbarTheme.disabledIconColor
         : toolbarTheme.iconColor;
-    if (_icon != null) {
+
+    if (_svgPath != null) {
+      return RawZefyrButton.svg(
+        action: action,
+        svgPath: _svgPath,
+        size: _iconSize,
+        iconColor: iconColor,
+        color: _getColor(editor, toolbarTheme),
+        onPressed: _getPressedHandler(editor, toolbar),
+      );
+    } else if (_icon != null) {
       return RawZefyrButton.icon(
         action: action,
         icon: _icon,
@@ -156,6 +184,17 @@ class RawZefyrButton extends StatelessWidget {
     @required this.color,
     @required this.onPressed,
   })  : child = Icon(icon, size: size, color: iconColor),
+        super();
+
+  /// Creates a [RawZefyrButton] containing an svg.
+  RawZefyrButton.svg({
+    @required this.action,
+    @required String svgPath,
+    double size,
+    Color iconColor,
+    @required this.color,
+    @required this.onPressed,
+  })  : child = SvgPicture.asset(svgPath, width: size, color: iconColor),
         super();
 
   /// Toolbar action associated with this button.

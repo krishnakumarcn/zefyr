@@ -26,6 +26,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
     final form = ListView(
       children: <Widget>[
         TextField(decoration: InputDecoration(labelText: 'Name')),
+//        ZefyrToolbar(),
         buildEditor(),
         TextField(
           decoration: InputDecoration(labelText: 'Details'),

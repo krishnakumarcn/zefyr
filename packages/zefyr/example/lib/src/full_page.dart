@@ -47,6 +47,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   final ZefyrController _controller =
       ZefyrController(NotusDocument.fromDelta(getDelta()));
   final FocusNode _focusNode = FocusNode();
+  final FocusScopeNode _focusScopeNode = FocusScopeNode();
   bool _editing = false;
   StreamSubscription<NotusChange> _sub;
   bool _darkTheme = false;
@@ -73,7 +74,6 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     final result = Scaffold(
       resizeToAvoidBottomPadding: true,
       appBar: AppBar(
-        title: ZefyrLogo(),
         actions: [
           done,
           PopupMenuButton<_Options>(
@@ -82,14 +82,63 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
           )
         ],
       ),
-      body: ZefyrScaffold(
-        child: ZefyrEditor(
-          controller: _controller,
-          focusNode: _focusNode,
-          mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-          imageDelegate: CustomImageDelegate(),
-          keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
-        ),
+//      AppBar(
+//        title: ZefyrLogo(),
+//        actions: [
+//          done,
+//          PopupMenuButton<_Options>(
+//            itemBuilder: buildPopupMenu,
+//            onSelected: handlePopupItemSelected,
+//          )
+//        ],
+//      ),
+      body: Column(
+        children: [
+          Expanded(
+//            child: ZefyrTheme(
+//              data: ZefyrThemeData.fallback(context).copyWith(
+//                  toolbarTheme: ToolbarTheme.fallback(context)
+//                      .copyWith(color: Colors.red)),
+            child: ZefyrScaffold(
+              child: ZefyrTheme(
+                data: ZefyrThemeData(
+                  toolbarTheme: ToolbarTheme.fallback(context).copyWith(
+                    color: Colors.white,
+                    toggleColor: Colors.pinkAccent,
+                    iconColor: Colors.deepPurple,
+                  ),
+
+//                ZefyrThemeData.fallback(context).copyWith(
+//                  attributeTheme: AttributeTheme(),
+//                  toolbarTheme: ToolbarTheme.fallback(context).copyWith(
+//                    color: Colors.green,
+//                    toggleColor: Colors.blue,
+//                      ),
+                ),
+                child: ZefyrEditor(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+                  imageDelegate: CustomImageDelegate(),
+                  toolbarDelegate: _MyToolbarDelegate(),
+                  keyboardAppearance:
+                      _darkTheme ? Brightness.dark : Brightness.light,
+                ),
+              ),
+            ),
+          ),
+//          ),
+//          Container(
+//            height: 120,
+//            child: ZefyrToolbar(
+//              editor: ZefyrScope.editable(
+//                  mode: ZefyrMode.edit,
+//                  controller: _controller,
+//                  focusNode: _focusNode,
+//                  focusScope: _focusScopeNode),
+//            ),
+//          ),
+        ],
       ),
     );
     if (_darkTheme) {
@@ -127,5 +176,83 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     setState(() {
       _editing = false;
     });
+  }
+}
+
+class _MyToolbarDelegate implements ZefyrToolbarDelegate {
+  static const kSvgButtonIcons = {
+    ZefyrToolbarAction.bold: 'images/aeroplane-icon.svg',
+  };
+  static const kDefaultButtonIcons = {
+    ZefyrToolbarAction.italic: Icons.format_italic,
+    ZefyrToolbarAction.link: Icons.link,
+    ZefyrToolbarAction.unlink: Icons.link_off,
+    ZefyrToolbarAction.clipboardCopy: Icons.content_copy,
+    ZefyrToolbarAction.openInBrowser: Icons.open_in_new,
+    ZefyrToolbarAction.heading: Icons.format_size,
+    ZefyrToolbarAction.bulletList: Icons.format_list_bulleted,
+    ZefyrToolbarAction.numberList: Icons.format_list_numbered,
+    ZefyrToolbarAction.code: Icons.code,
+    ZefyrToolbarAction.quote: Icons.format_quote,
+    ZefyrToolbarAction.horizontalRule: Icons.remove,
+    ZefyrToolbarAction.image: Icons.photo,
+    ZefyrToolbarAction.cameraImage: Icons.photo_camera,
+    ZefyrToolbarAction.galleryImage: Icons.photo_library,
+    ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
+    ZefyrToolbarAction.close: Icons.close,
+    ZefyrToolbarAction.confirm: Icons.check,
+  };
+
+  static const kSpecialIconSizes = {
+    ZefyrToolbarAction.unlink: 20.0,
+    ZefyrToolbarAction.clipboardCopy: 20.0,
+    ZefyrToolbarAction.openInBrowser: 20.0,
+    ZefyrToolbarAction.close: 20.0,
+    ZefyrToolbarAction.confirm: 20.0,
+  };
+
+  static const kDefaultButtonTexts = {
+    ZefyrToolbarAction.headingLevel1: 'H1',
+    ZefyrToolbarAction.headingLevel2: 'H2',
+    ZefyrToolbarAction.headingLevel3: 'H3',
+  };
+
+  @override
+  Widget buildButton(BuildContext context, ZefyrToolbarAction action,
+      {VoidCallback onPressed}) {
+    final theme = Theme.of(context);
+    if (kSvgButtonIcons.containsKey(action)) {
+      final iconPath = kSvgButtonIcons[action];
+      final size = kSpecialIconSizes[action];
+
+      return ZefyrButton.svg(
+        action: action,
+        iconSize: size,
+        assetName: iconPath,
+        onPressed: onPressed,
+      );
+    }
+    if (kDefaultButtonIcons.containsKey(action)) {
+      final icon = kDefaultButtonIcons[action];
+      final size = kSpecialIconSizes[action];
+
+      return ZefyrButton.icon(
+        action: action,
+        icon: icon,
+        iconSize: size,
+        onPressed: onPressed,
+      );
+    } else {
+      final text = kDefaultButtonTexts[action];
+      if (text == null) return Container();
+      final style = theme.textTheme.caption
+          .copyWith(fontWeight: FontWeight.bold, fontSize: 14.0);
+      return ZefyrButton.text(
+        action: action,
+        text: text,
+        style: style,
+        onPressed: onPressed,
+      );
+    }
   }
 }
