@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
+import 'package:notustohtml/notustohtml.dart';
 
 import 'images.dart';
 
@@ -176,6 +177,12 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     setState(() {
       _editing = false;
     });
+    final converter = NotusHtmlCodec();
+
+    String html = converter.encode(_controller.document.toDelta()); //
+    // HTML Output
+
+    print(html);
   }
 }
 
@@ -193,8 +200,8 @@ class _MyToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.bulletList: Icons.format_list_bulleted,
     ZefyrToolbarAction.numberList: Icons.format_list_numbered,
     ZefyrToolbarAction.code: Icons.code,
-    ZefyrToolbarAction.quote: Icons.format_quote,
-    ZefyrToolbarAction.horizontalRule: Icons.remove,
+//    ZefyrToolbarAction.quote: Icons.format_quote,
+//    ZefyrToolbarAction.horizontalRule: Icons.remove,
     ZefyrToolbarAction.image: Icons.photo,
     ZefyrToolbarAction.cameraImage: Icons.photo_camera,
     ZefyrToolbarAction.galleryImage: Icons.photo_library,
@@ -205,8 +212,8 @@ class _MyToolbarDelegate implements ZefyrToolbarDelegate {
 
   static const kSpecialIconSizes = {
     ZefyrToolbarAction.unlink: 20.0,
-    ZefyrToolbarAction.clipboardCopy: 20.0,
-    ZefyrToolbarAction.openInBrowser: 20.0,
+//    ZefyrToolbarAction.clipboardCopy: 20.0,
+//    ZefyrToolbarAction.openInBrowser: 20.0,
     ZefyrToolbarAction.close: 20.0,
     ZefyrToolbarAction.confirm: 20.0,
   };

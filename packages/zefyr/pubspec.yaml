@@ -17,6 +17,8 @@ dependencies:
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
   flutter_svg: ^0.18.0
+  notustohtml: ^0.0.7
+
 
 
 dev_dependencies:
